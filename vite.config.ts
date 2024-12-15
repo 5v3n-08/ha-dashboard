@@ -8,6 +8,7 @@ import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/spa',
   plugins: [
     vue(),
     Components({
