@@ -11,4 +11,4 @@ arch:
   - i386
 startup: services
 ports:
-  4173/tcp: 4173
+  80/tcp: 8081
