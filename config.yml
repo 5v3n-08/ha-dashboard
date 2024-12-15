@@ -11,8 +11,8 @@ arch:
   - i386
 startup: services
 ports:
-  80/tcp: 8081
-  443/tcp: 8082
+  8081/tcp: 8081
+  8082/tcp: 8082
 map:
   - ssl
   - share
