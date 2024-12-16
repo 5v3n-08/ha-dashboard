@@ -21,6 +21,7 @@ withDefaults(defineProps<BaseCardStateProps>(), {
   font-size: 12px;
   font-weight: normal;
   opacity: 0.7;
+  color: var(--text-color);
   display: flex;
   position: relative;
   white-space: nowrap;

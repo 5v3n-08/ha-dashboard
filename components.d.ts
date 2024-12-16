@@ -7,10 +7,14 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Button: typeof import('primevue/button')['default']
     CardState: typeof import('./src/components/base/card-state.vue')['default']
     CardTitle: typeof import('./src/components/base/card-title.vue')['default']
+    Dialog: typeof import('primevue/dialog')['default']
     DynamicComponents: typeof import('./src/components/dynamic-components.vue')['default']
     HaButton: typeof import('./src/components/ha-button/ha-button.vue')['default']
+    HaDialog: typeof import('./src/components/ha-dialog/ha-dialog.vue')['default']
+    InputText: typeof import('primevue/inputtext')['default']
     PrependCardIcon: typeof import('./src/components/base/prepend-card-icon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

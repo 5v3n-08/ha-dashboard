@@ -6,6 +6,7 @@
       :color="iconColor"
       :badge-icon="badgeIcon"
       :badge-color="badgeColor"
+      @click="dialog?.setOpenDialogId('test')"
     />
     <div class="content-container">
       <base-card-title :is-loading="mainStore.initialLoading" :name="name" />
@@ -19,10 +20,11 @@ import { useLiquidJsTemplate } from '@/services/liquidjs/use-liqiuid-js-template
 import { useLiquidJs } from '@/services/liquidjs/use-liquid-js'
 import { useHomeassistantStore } from '@/stores/homeassistant'
 import { useMainStore } from '@/stores/main'
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import BasePrependCardIcon from '../base/prepend-card-icon.vue'
 import BaseCardTitle from '../base/card-title.vue'
 import BaseCardState from '../base/card-state.vue'
+import { OpenDialogIdSymbol } from '@/symbols'
 
 export type HaButtonProps = {
   entityId?: string
@@ -42,6 +44,8 @@ const mainStore = useMainStore()
 const { getState } = useHomeassistantStore()
 const { isTemplate } = useLiquidJs()
 const entity = computed(() => getState(props.entityId))
+
+const dialog = inject(OpenDialogIdSymbol)
 
 const name = computed(() => {
   if (props.name === undefined) {
@@ -85,17 +89,17 @@ const badgeColor = computed(() =>
 
 <style scoped lang="css">
 .card-container {
-  --active-color: #ff9800;
-  --secondary-background-color: #282828;
-  --card-background-color: #1c1c1c;
+  /* --active-color: #ff9800; */
+  /* --secondary-background-color: ; */
+  /* --card-background-color: #1c1c1c; */
   padding: 0;
   background: none;
   border: medium;
   box-shadow: none;
   width: 100%;
   height: 50px;
-  background-color: var(--secondary-background-color);
-  border-radius: 32px;
+  background-color: var(--color-card-background);
+  border-radius: 12px;
   overflow: scroll;
   touch-action: pan-y;
   transition: background-color 1.5s;

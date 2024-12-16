@@ -20,7 +20,7 @@ withDefaults(defineProps<BaseCardTitleProps>(), {
 .name {
   font-size: 13px;
   font-weight: 600;
-  color: white;
+  color: var(--text-color);
   display: flex;
   position: relative;
   white-space: nowrap;

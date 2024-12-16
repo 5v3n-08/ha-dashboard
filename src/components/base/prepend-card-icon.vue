@@ -42,8 +42,8 @@ withDefaults(defineProps<BasePrependCardIconProps>(), {
   min-width: 38px;
   min-height: 38px;
   margin: 6px;
-  border-radius: 50%;
-  background-color: var(--card-background-color);
+  border-radius: 12px;
+  background-color: var(--color-card-icon-background);
   overflow: visible;
   cursor: pointer;
 
@@ -60,7 +60,7 @@ withDefaults(defineProps<BasePrependCardIconProps>(), {
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    background-color: var(--card-background-color);
+    background-color: var(--color-card-icon-background);
     color: var(--badge-icon-color);
     inset-block-start: 0;
     inset-inline-end: 0;

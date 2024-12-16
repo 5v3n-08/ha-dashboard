@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="props.type === 'horizontal'"
-    class="flex gap-2 w-full"
+    class="flex gap-2"
     :class="props.config?.breakOnSm ? 'flex-col md:flex-row' : 'flex-row'"
   >
     <dynamic-components
@@ -11,7 +11,7 @@
       class="flex-1"
     />
   </div>
-  <div v-else-if="type === 'vertical'" class="flex flex-col gap-2 w-full">
+  <div v-else-if="type === 'vertical'" class="flex flex-col gap-2">
     <dynamic-components
       v-for="(item, index) in content"
       :key="index"
