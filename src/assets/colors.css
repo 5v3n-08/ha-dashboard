@@ -24,4 +24,6 @@
 
   /* App color */
   /* --secondary-background-color: #282828; */
+
+  --color-icon-green: var(--p-green-600);
 }

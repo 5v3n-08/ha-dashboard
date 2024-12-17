@@ -8,7 +8,7 @@
       v-for="(item, index) in content"
       :key="index"
       v-bind="item"
-      class="flex-1"
+      class="flex-1 grow"
     />
   </div>
   <div v-else-if="type === 'vertical'" class="flex flex-col gap-2">
@@ -16,7 +16,7 @@
       v-for="(item, index) in content"
       :key="index"
       v-bind="item"
-      class="flex-1"
+      class="flex-1 grow"
     />
   </div>
   <template v-else-if="type === 'ha-button'">
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import type { HaButtonProps } from './ha-button/ha-button.vue'
+import type { HaDialogProps } from './ha-dialog/ha-dialog.vue'
 
 type ConfigRowElement = {
   type: 'horizontal'
@@ -43,6 +44,11 @@ type ConfigColElement = {
 type ConfigHaButton = {
   type: 'ha-button'
   config: HaButtonProps
+}
+export type ConfigHaDialog = {
+  type: 'ha-dialog'
+  config: HaDialogProps
+  content?: Elements[]
 }
 type ConfigEmpty = {
   type: 'empty'

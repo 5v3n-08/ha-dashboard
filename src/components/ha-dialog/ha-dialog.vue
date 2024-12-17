@@ -7,15 +7,7 @@
     :modal="true"
     :draggable="false"
   >
-    <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span>
-    <div class="flex items-center gap-4 mb-4">
-      <label for="username" class="font-semibold w-24">Username</label>
-      <InputText id="username" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex items-center gap-4 mb-8">
-      <label for="email" class="font-semibold w-24">Email</label>
-      <InputText id="email" class="flex-auto" autocomplete="off" />
-    </div>
+    <slot />
     <div class="flex justify-end gap-2">
       <Button
         type="button"
@@ -32,7 +24,24 @@
 import { OpenDialogIdSymbol } from '@/symbols'
 import { computed, inject } from 'vue'
 
-const dialog = inject(OpenDialogIdSymbol)
+export type HaDialogProps = {
+  dialogId: string
+}
 
-const isOpen = computed(() => !!dialog?.openDialogId.value)
+const props = withDefaults(defineProps<HaDialogProps>(), {})
+
+const dialog = inject(OpenDialogIdSymbol)
+const isOpen = computed(() => dialog?.openDialogId.value === props.dialogId)
+
+const config = {
+  type: 'ha-button',
+  config: {
+    entityId: 'person.sven_stiels',
+    icon: '{% full_area_context %} {% if person.sven_stiels.state == "not_home" %} home-export-outline {% else %} {{ area[sensor.esp_iphone_sven.state].icon }}  {% endif %}',
+    iconColor:
+      '{% if person.sven_stiels.state == "not_home" %} red {% else %} var(--color-icon-green) {% endif %}',
+    state:
+      '{% full_area_context %} {% if person.sven_stiels.state == "not_home" %} {{ person.sven_stiels.state | translate }} {% else %} {{ area[sensor.esp_iphone_sven.state].name }} {% endif %}',
+  },
+}
 </script>

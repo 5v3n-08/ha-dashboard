@@ -2,7 +2,13 @@
   <div v-for="(row, index) in config.content" :key="index" class="w-full p-4">
     <dynamic-components v-bind="row"></dynamic-components>
   </div>
-  <ha-dialog></ha-dialog>
+  <ha-dialog v-for="dialog in config.dialogs" :key="dialog.config.dialogId" v-bind="dialog.config">
+    <dynamic-components
+      v-for="(component, index) in dialog.content"
+      :key="index"
+      v-bind="component"
+    ></dynamic-components>
+  </ha-dialog>
 </template>
 
 <script setup lang="ts">
