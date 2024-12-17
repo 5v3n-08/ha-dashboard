@@ -56,7 +56,7 @@ const dialog1: ConfigHaDialog = {
 const dialog2: ConfigHaDialog = {
   type: 'ha-dialog',
   config: { dialogId: '#anna' },
-  content: [personsRow.content[1]],
+  content: [personsRow.content![1]],
 }
 
 const leftSide: Elements = {
