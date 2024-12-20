@@ -91,6 +91,10 @@ const { isTemplate } = useLiquidJs()
 const { onClick, onIconClick } = useHaAction(props.actions ?? [])
 const entity = computed(() => getState(props.entityId))
 
+if (props.debug) {
+  console.log(entity)
+}
+
 const showName = useHaTemplating(props.showName, true)
 const name = useHaTemplating(
   props.name,

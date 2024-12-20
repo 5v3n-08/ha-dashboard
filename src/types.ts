@@ -16,4 +16,5 @@ export type BaseStateConfig = {
   iconColor?: string
   visible?: boolean | string
   actions?: HaAction[]
+  debug?: boolean
 }
