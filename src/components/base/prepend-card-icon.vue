@@ -16,6 +16,7 @@
 type BasePrependCardIconProps = {
   icon?: string
   color?: string
+  showBadgeIcon?: boolean
   badgeIcon?: string
   badgeColor?: string
   isLoading?: boolean

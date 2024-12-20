@@ -1,11 +1,30 @@
 import type { ConfigHaDialog, Elements } from '@/components/dynamic-components.vue'
+import type { HaButtonProps } from './components/ha-button/ha-button.vue'
 
-const stromConfig = {
+const stromConfig: HaButtonProps = {
   entityId: 'sensor.aktueller_stromverbrauch_watt',
-  name: 'Aktueller Stromverbrauch',
+  name: 'Stromübersicht',
   // icon: '{% full_area_context %} {% if person.astiels.state == "not_home" %} home-export-outline {% else %} {{ area[sensor.esp_iphone_anna.state].icon }}  {% endif %}',
   // iconColor: '{% if person.astiels.state == "not_home" %} red {% else %} green {% endif %}',
-  state: '{{ sensor.aktueller_stromverbrauch_watt.state }} W',
+  icon: '{% if sensor.aktueller_stromverbrauch_watt.state > 0 %} transmission-tower-export {% else %} transmission-tower-import {% endif %}',
+  iconColor:
+    '{% if sensor.aktueller_stromverbrauch_watt.state > 20 %} yellow {% elsif sensor.aktueller_stromverbrauch_watt.state > 0 %} green {% else %} red {% endif %}',
+  state: [
+    { entityId: 'sensor.aktueller_stromverbrauch_watt', icon: 'transmission-tower' },
+    {
+      entityId: 'sensor.gesamter_stromverbrauch_watt',
+      icon: 'home-lightning-bolt',
+      visible: '{% if sensor.stromerzeugung_watt.state > 0 %} true {% else %} false {% endif %}',
+    },
+    {
+      entityId: 'sensor.solarbank_2_e1600_pro_dc_ausgangsleistung',
+      icon: 'solar-power-variant',
+      state:
+        '{% if sensor.solarbank_2_e1600_pro_dc_ausgangsleistung.state != sensor.solarbank_2_e1600_pro_einspeisevorgabe.state %} {{ sensor.solarbank_2_e1600_pro_dc_ausgangsleistung.state }} W ({{ sensor.solarbank_2_e1600_pro_einspeisevorgabe.state }} W) {% else %} {{ sensor.solarbank_2_e1600_pro_dc_ausgangsleistung.state }} W {% endif %}',
+      visible:
+        '{% if sensor.solarbank_2_e1600_pro_dc_ausgangsleistung.state > 0 %} true {% else %} false {% endif %}',
+    },
+  ],
 }
 
 type Config = {
@@ -21,8 +40,8 @@ const personsRow: Elements = {
       type: 'ha-button',
       config: {
         actions: [
-          { type: 'click', context: 'dialog', data: { dialogId: '#sven' } },
-          { type: 'icon-click', context: 'dialog', data: { dialogId: '#anna' } },
+          { type: 'click', context: 'dialog', options: { dialogId: '#sven' } },
+          { type: 'icon-click', context: 'dialog', options: { dialogId: '#anna' } },
         ],
         entityId: 'person.sven_stiels',
         icon: '{% full_area_context %} {% if person.sven_stiels.state == "not_home" %} home-export-outline {% else %} {{ area[sensor.esp_iphone_sven.state].icon }}  {% endif %}',
@@ -35,7 +54,7 @@ const personsRow: Elements = {
     {
       type: 'ha-button',
       config: {
-        actions: [{ type: 'click', context: 'dialog', data: { dialogId: '#anna' } }],
+        actions: [{ type: 'click', context: 'dialog', options: { dialogId: '#anna' } }],
         entityId: 'person.astiels',
         icon: '{% full_area_context %} {% if person.astiels.state == "not_home" %} home-export-outline {% else %} {{ area[sensor.esp_iphone_anna.state].icon }}  {% endif %}',
         iconColor:
@@ -92,13 +111,17 @@ export const config: Config = {
                 entityId: 'sensor.speck_25_strompreis',
                 name: 'Strompreis',
                 state: [
-                  { entityId: 'sensor.speck_25_strompreis' },
-                  { entityId: 'sensor.aktueller_stromverbrauch_watt' },
+                  { entityId: 'sensor.speck_25_strompreis', showIcon: false },
                   { entityId: 'sensor.gesamter_stromverbrauch_watt' },
                 ],
                 appendItems: [
-                  { entityId: 'sensor.aktueller_stromverbrauch_watt' },
-                  { entityId: 'sensor.aktueller_stromverbrauch_watt' },
+                  { entityId: 'sensor.system_zuhause_taglicher_solarertrag', icon: 'solar-panel' },
+                  {
+                    entityId: 'sensor.tibber_pulse_speck_25_kumulierter_verbrauch',
+                    icon: 'counter',
+                    state:
+                      '{{ sensor.tibber_pulse_speck_25_kumulierter_verbrauch.state | round: 2  }} kWh',
+                  },
                 ],
               },
             },

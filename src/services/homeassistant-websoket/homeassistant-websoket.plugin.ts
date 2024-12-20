@@ -7,7 +7,6 @@ import { useMainStore } from '@/stores/main'
 export default {
   install: async (app: App) => {
     const store = useHomeassistantStore()
-    console.log(import.meta.env)
 
     const client = await hass({
       token: import.meta.env.VITE_WEBSOCKET_TOKEN,

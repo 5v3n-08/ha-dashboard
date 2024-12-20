@@ -13,7 +13,6 @@ export const useLiquidJsTemplate = (template: string) => {
     const regex = /(?<id>(person|sensor|switch|area)[.][\w]+)/gm
     const matches = [...template.matchAll(regex)]
     const entities = uniq(matches.map((m) => m.groups?.id).filter((i) => i !== undefined))
-    if (template.includes('area')) console.log(entities)
 
     for (const entityId of entities) {
       const isArea = entityId.startsWith('area.')
@@ -34,7 +33,6 @@ export const useLiquidJsTemplate = (template: string) => {
       }
     }
 
-    if (template.includes('area')) console.log(context)
     return parse(template, context).trim()
   })
 

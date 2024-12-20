@@ -1,11 +1,6 @@
 import { OpenDialogIdSymbol } from '@/symbols'
+import type { HaAction } from '@/types'
 import { inject } from 'vue'
-
-export type HaAction = {
-  type: 'click' | 'icon-click'
-  context: 'dialog'
-  data: { dialogId: string }
-}
 
 export const useHaAction = (actions: HaAction[]) => {
   const dialog = inject(OpenDialogIdSymbol)
@@ -14,7 +9,7 @@ export const useHaAction = (actions: HaAction[]) => {
   const onClick = isOnClickAvailable
     ? () => {
         const action = actions.find((v) => v.type === 'click')
-        dialog?.setOpenDialogId(action?.data.dialogId)
+        dialog?.setOpenDialogId(action?.options.dialogId)
       }
     : undefined
 
@@ -22,7 +17,7 @@ export const useHaAction = (actions: HaAction[]) => {
   const onIconClick = isOnIconClickAvailable
     ? () => {
         const action = actions.find((v) => v.type === 'icon-click')
-        dialog?.setOpenDialogId(action?.data.dialogId)
+        dialog?.setOpenDialogId(action?.options.dialogId)
       }
     : undefined
 

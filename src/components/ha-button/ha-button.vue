@@ -1,31 +1,53 @@
 <template>
   <button unstyled class="card-container" @click="onClick">
     <base-prepend-card-icon
+      v-if="toBoolean(showIcon)"
       :isLoading="mainStore.initialLoading"
       :icon="icon"
       :color="iconColor"
+      :show-badge-icon="toBoolean(showBadgeIcon)"
       :badge-icon="badgeIcon"
       :badge-color="badgeColor"
       @click.stop="onIconClick ? onIconClick() : undefined"
     />
     <div class="content-container">
-      <base-card-title :is-loading="mainStore.initialLoading" :name="name" />
+      <base-card-title
+        v-if="toBoolean(showName)"
+        :is-loading="mainStore.initialLoading"
+        :name="name"
+      />
 
-      <div v-if="Array.isArray(state)" class="flex">
-        <template v-for="(item, index) in state" :key="index">
-          <base-card-append-item v-bind="item" :is-loading="mainStore.initialLoading" />
-          <base-card-append-item
-            v-if="index + 1 < state.length && !mainStore.initialLoading"
-            class="mx-1"
-            state="•"
-          />
-        </template>
-      </div>
+      <template v-if="toBoolean(showState)">
+        <div v-if="Array.isArray(state)" class="flex">
+          <template v-for="(item, index) in state" :key="index">
+            <base-card-append-item
+              v-if="toBoolean(item.visible) && index > 0 && !mainStore.initialLoading"
+              class="mx-1"
+              state="•"
+            />
+            <base-card-append-item
+              v-if="toBoolean(item.visible)"
+              v-bind="item"
+              :show-icon="toBoolean(item.showIcon)"
+              :show-state="toBoolean(item.showState)"
+              :is-loading="mainStore.initialLoading"
+            />
+          </template>
+        </div>
 
-      <base-card-state v-else :is-loading="mainStore.initialLoading" :state="state" />
+        <base-card-state v-else :is-loading="mainStore.initialLoading" :state="state" />
+      </template>
     </div>
+
     <div class="append-items-container">
-      <base-card-append-item v-for="(item, index) in appendItems" :key="index" v-bind="item" />
+      <template v-for="(item, index) in appendItems" :key="index">
+        <base-card-append-item
+          v-if="toBoolean(item.visible)"
+          v-bind="item"
+          :show-icon="toBoolean(item.showIcon)"
+          :show-state="toBoolean(item.showState)"
+        />
+      </template>
     </div>
   </button>
 </template>
@@ -35,34 +57,32 @@ import { useLiquidJsTemplate } from '@/services/liquidjs/use-liqiuid-js-template
 import { useLiquidJs } from '@/services/liquidjs/use-liquid-js'
 import { useHomeassistantStore } from '@/stores/homeassistant'
 import { useMainStore } from '@/stores/main'
-import { computed, inject, ref } from 'vue'
+import { computed } from 'vue'
 import BasePrependCardIcon from '../base/prepend-card-icon.vue'
 import BaseCardTitle from '../base/card-title.vue'
 import BaseCardState from '../base/card-state.vue'
 import BaseCardAppendItem from '../base/card-append-item.vue'
-import { useHaAction, type HaAction } from '@/services/use-ha-action'
-
-type HaButtonAppendItem = {
-  entityId?: string
-  state?: string
-  icon?: string
-  iconColor?: string
-}
+import { useHaAction } from '@/services/use-ha-action'
+import type { BaseStateConfig } from '@/types'
+import { useHaTemplating } from '@/services/use-ha-templating'
+import { toBoolean } from '@/services/helpers'
 
 export type HaButtonProps = {
-  entityId?: string
   name?: string
-  state?: string | HaButtonAppendItem[]
-  icon?: string
-  iconColor?: string
+  showName?: boolean | string
+  state?: string | BaseStateConfig[]
+  showBadgeIcon?: boolean | string
   badgeIcon?: string
   badgeColor?: string
-  appendItems?: HaButtonAppendItem[]
-  actions?: HaAction[]
-}
+  appendItems?: BaseStateConfig[]
+} & Omit<BaseStateConfig, 'state'>
 
 const props = withDefaults(defineProps<HaButtonProps>(), {
   entityId: '',
+  showName: true,
+  showState: true,
+  showIcon: true,
+  showBadgeIcon: true,
 })
 
 const mainStore = useMainStore()
@@ -71,38 +91,43 @@ const { isTemplate } = useLiquidJs()
 const { onClick, onIconClick } = useHaAction(props.actions ?? [])
 const entity = computed(() => getState(props.entityId))
 
-const name = computed(() => {
-  if (props.name === undefined) {
-    return entity.value?.friendlyName
-  }
-  return isTemplate(props.name) ? useLiquidJsTemplate(props.name).value : props.name
-})
+const showName = useHaTemplating(props.showName, true)
+const name = useHaTemplating(
+  props.name,
+  computed(() => entity.value?.friendlyName),
+)
+const showState = useHaTemplating(props.showState, true)
+const showIcon = useHaTemplating(props.showIcon, true)
+const icon = useHaTemplating(
+  props.icon,
+  computed(() => entity.value?.icon),
+)
+const iconColor = useHaTemplating(props.iconColor)
+const showBadgeIcon = useHaTemplating(props.showBadgeIcon, true)
+const badgeIcon = useHaTemplating(props.badgeIcon)
+const badgeColor = useHaTemplating(props.badgeColor)
+const isVisible = useHaTemplating(props.visible, true)
 
 const state = computed(() => {
   if (props.state === undefined) {
     return entity.value?.getState({ withUnit: true })
   }
   if (Array.isArray(props.state)) {
-    const states: HaButtonAppendItem[] = []
-
+    const states: BaseStateConfig[] = []
     for (const item of props.state) {
       const entity = item.entityId ? getState(item.entityId) : undefined
       states.push({
         entityId: item.entityId,
-        state: item.state
-          ? isTemplate(item.state)
-            ? useLiquidJsTemplate(item.state).value
-            : item.state
-          : entity?.getState({ withUnit: true }),
-        icon: item.icon
-          ? isTemplate(item.icon)
-            ? useLiquidJsTemplate(item.icon).value
-            : item.icon
-          : entity?.icon,
-        iconColor:
-          item.iconColor && isTemplate(item.iconColor)
-            ? useLiquidJsTemplate(item.iconColor).value
-            : item.iconColor,
+        showState: useHaTemplating(item.showState, true).value,
+        state: useHaTemplating(
+          item.state,
+          computed(() => entity?.getState({ withUnit: true })),
+        ).value,
+        showIcon: useHaTemplating(item.showIcon, true).value,
+        icon: useHaTemplating(item.icon, entity?.icon).value,
+        iconColor: useHaTemplating(item.iconColor).value,
+        visible: useHaTemplating(item.visible, true).value,
+        actions: item.actions,
       })
     }
     return states
@@ -110,55 +135,27 @@ const state = computed(() => {
   return isTemplate(props.state) ? useLiquidJsTemplate(props.state).value : props.state
 })
 
-const icon = computed(() => {
-  if (props.icon === undefined) {
-    return entity.value?.icon
-  }
-  return isTemplate(props.icon) ? useLiquidJsTemplate(props.icon).value : props.icon
-})
-
-const iconColor = computed(() =>
-  props.iconColor && isTemplate(props.iconColor)
-    ? useLiquidJsTemplate(props.iconColor).value
-    : props.iconColor,
-)
-
-const badgeIcon = computed(() =>
-  props.badgeIcon && isTemplate(props.badgeIcon)
-    ? useLiquidJsTemplate(props.badgeIcon).value
-    : props.badgeIcon,
-)
-
-const badgeColor = computed(() =>
-  props.badgeColor && isTemplate(props.badgeColor)
-    ? useLiquidJsTemplate(props.badgeColor).value
-    : props.badgeColor,
-)
-
 const appendItems = computed(() => {
-  const states: HaButtonAppendItem[] = []
+  const states: BaseStateConfig[] = []
   if (!props.appendItems) {
     return states
   }
 
   for (const item of props.appendItems) {
     const entity = item.entityId ? getState(item.entityId) : undefined
+
     states.push({
       entityId: item.entityId,
-      state: item.state
-        ? isTemplate(item.state)
-          ? useLiquidJsTemplate(item.state).value
-          : item.state
-        : entity?.getState({ withUnit: true }),
-      icon: item.icon
-        ? isTemplate(item.icon)
-          ? useLiquidJsTemplate(item.icon).value
-          : item.icon
-        : entity?.icon,
-      iconColor:
-        item.iconColor && isTemplate(item.iconColor)
-          ? useLiquidJsTemplate(item.iconColor).value
-          : item.iconColor,
+      showState: useHaTemplating(item.showState, true).value,
+      state: useHaTemplating(
+        item.state,
+        computed(() => entity?.getState({ withUnit: true })),
+      ).value,
+      showIcon: useHaTemplating(item.showIcon, true).value,
+      icon: useHaTemplating(item.icon, entity?.icon).value,
+      iconColor: useHaTemplating(item.iconColor).value,
+      visible: useHaTemplating(item.visible, true).value,
+      actions: item.actions,
     })
   }
 

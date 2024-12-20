@@ -1,24 +1,29 @@
 <template>
   <div class="append-item" style="">
     <mdicon
-      v-if="icon"
+      v-if="showIcon && icon"
       class="icon"
       :size="12"
       :name="icon"
       :style="{ '--icon-color': iconColor }"
     />
-    <span>{{ state }}</span>
+    <span v-if="showState">{{ state }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 type BaseCardAppendItemProps = {
+  showState?: boolean
   state?: string
+  showIcon?: boolean
   icon?: string
   iconColor?: string
 }
 
-withDefaults(defineProps<BaseCardAppendItemProps>(), {})
+withDefaults(defineProps<BaseCardAppendItemProps>(), {
+  showIcon: true,
+  showState: true,
+})
 </script>
 
 <style lang="css" scoped>
