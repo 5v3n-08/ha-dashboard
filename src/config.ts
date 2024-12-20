@@ -10,7 +10,10 @@ const stromConfig: HaButtonProps = {
   iconColor:
     '{% if sensor.aktueller_stromverbrauch_watt.state > 20 %} yellow {% elsif sensor.aktueller_stromverbrauch_watt.state > 0 %} green {% else %} red {% endif %}',
   state: [
-    { entityId: 'sensor.aktueller_stromverbrauch_watt', icon: 'transmission-tower' },
+    {
+      entityId: 'sensor.aktueller_stromverbrauch_watt',
+      showIcon: '{% if sensor.stromerzeugung_watt.state > 0 %} true {% else %} false {% endif %}',
+    },
     {
       entityId: 'sensor.gesamter_stromverbrauch_watt',
       icon: 'home-lightning-bolt',
@@ -80,17 +83,7 @@ const dialog2: ConfigHaDialog = {
 
 const leftSide: Elements = {
   type: 'vertical',
-  content: [
-    personsRow,
-    {
-      type: 'horizontal',
-      content: [
-        { type: 'ha-button', config: { entityId: 'sensor.aktueller_stromverbrauch_watt' } },
-        { type: 'empty' },
-        { type: 'ha-button', config: { entityId: 'sensor.aktueller_stromverbrauch_watt' } },
-      ],
-    },
-  ],
+  content: [personsRow],
 }
 
 export const config: Config = {
@@ -108,14 +101,28 @@ export const config: Config = {
             {
               type: 'ha-button',
               config: {
+                debug: true,
                 entityId: 'sensor.speck_25_strompreis',
                 name: 'Strompreis',
+                iconColor:
+                  '{% if sensor.speck_25_strompreis.attributes.price_level == "HIGH" %} red {% elsif sensor.speck_25_strompreis.attributes.price_level == "LOW" %} var(--color-icon-green) {% elsif sensor.speck_25_strompreis.attributes.price_level == "NORMAL" %} yellow {% endif %}',
                 state: [
-                  { entityId: 'sensor.speck_25_strompreis', showIcon: false },
-                  { entityId: 'sensor.gesamter_stromverbrauch_watt' },
+                  {
+                    entityId: 'sensor.speck_25_strompreis',
+                    state: '{{ sensor.speck_25_strompreis.state | round: 2 }} EUR/kWh',
+                    showIcon: false,
+                  },
+                  {
+                    state:
+                      '{{ sensor.tibber_pulse_speck_25_kumulierte_kosten.state | round: 2 }} €',
+                    showIcon: false,
+                  },
                 ],
                 appendItems: [
-                  { entityId: 'sensor.system_zuhause_taglicher_solarertrag', icon: 'solar-panel' },
+                  {
+                    entityId: 'sensor.system_zuhause_taglicher_hausverbrauch',
+                    icon: 'solar-panel',
+                  },
                   {
                     entityId: 'sensor.tibber_pulse_speck_25_kumulierter_verbrauch',
                     icon: 'counter',
